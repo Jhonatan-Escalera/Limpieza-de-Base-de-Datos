@@ -1,0 +1,69 @@
+# Primero se debe establecer un WD
+# DATOS ATÍPICOS
+boxplot(Prueba$`Gasto a la semana`,horizontal = FALSE, col="orange")
+boxplot.stats(Prueba$`Gasto a la semana`)
+Prueba<- subset(Prueba,`Gasto a la semana`< 56)
+boxplot(Prueba$`Gasto a la semana`, horizontal= FALSE,col="green3")
+boxplot.stats(Prueba$`Gasto a la semana`)
+Prueba<- subset(Prueba,`Gasto a la semana`< 40)
+boxplot(Prueba$`Gasto a la semana`, horizontal= FALSE,col="lightblue")
+boxplot(Prueba$`Gasto a la semana`~Prueba$Zona, horizontal= FALSE,col="lightblue")
+
+library(tidyverse)
+library(ggplot2)
+g1 <- ggplot(data = Prueba)+ geom_boxplot(mapping = aes(x=`Zona`,y = `Gasto a la semana`), fill = "red3", color="black")
+g1
+#-------------------------------------------------------------------------
+### TRATAMIENTO DE VALORES PERDIDOS (Con Prueba)###
+install.packages("mice")
+library(mice)
+x <- na.omit(Prueba) # Eliminar filas con valores NA
+md.pattern(x) #Gráfica de NA
+
+#Otra forma de visualizar datos perdidos
+library(DataExplorer)
+plot_missing(Prueba)
+#Reemplazar por la media
+mean(Prueba$`Gasto a la semana`,na.rm = TRUE)
+Prueba$Gasto_corregido<- ifelse(is.na(Prueba$`Gasto a la semana`),
+                                mean(Prueba$`Gasto a la semana`,na.rm = TRUE),
+                                Prueba$`Gasto a la semana`)
+
+##Con BD_BANCOS##
+library(mice)
+md.pattern(BD_BANCOS) #Gráfica de NA
+summary(BD_BANCOS)
+
+#Otra forma de visualizar datos perdidos
+library(DataExplorer)
+plot_missing(BD_BANCOS)
+
+#Imputación a través de vecinos más cercanos (BD-BANCOS)
+install.packages('VIM')
+library(VIM)
+?kNN
+df <- kNN(BD_BANCOS, k=5)
+summary(df)
+BD_BANCOS <- df[,c(1:8)]
+#-------------------------------------------------------------------------
+##NORMALIZACIÓN##
+
+# Reescalamiento (0-1) y normalización (Media = 0 - DS = 1)
+#Min-Max
+library(scales)
+Prueba$GS <- rescale(Prueba$`Gasto a la semana`)
+Prueba$FS <- rescale(Prueba$`Frecuencia de compra a la semana`)
+Prueba$LS <- rescale(Prueba$`Litros de consumo a la semana`)
+
+max(Prueba$`Gasto a la semana`,na.rm = TRUE)
+min(Prueba$`Gasto a la semana`,na.rm = TRUE)
+
+boxplot(Prueba[,c(5,6,7)], col = "rainbow"(7),horizontal = TRUE)
+boxplot(Prueba[,c(8,9,10)], col = "rainbow"(7),horizontal = TRUE)
+
+#Normalización
+Prueba$N_GS <- scale(Prueba$`Gasto a la semana`)
+
+media <- mean(Prueba$`Gasto a la semana`,na.rm = TRUE)
+sd <- sd(Prueba$`Gasto a la semana`,na.rm = TRUE)
+Prueba$N_GS2 <- (Prueba$`Gasto a la semana`-media)/sd
