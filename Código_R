@@ -67,3 +67,8 @@ Prueba$N_GS <- scale(Prueba$`Gasto a la semana`)
 media <- mean(Prueba$`Gasto a la semana`,na.rm = TRUE)
 sd <- sd(Prueba$`Gasto a la semana`,na.rm = TRUE)
 Prueba$N_GS2 <- (Prueba$`Gasto a la semana`-media)/sd
+
+#Alpha de Cronbach (BD-ESCALAS)
+install.packages('umx')
+library(umx)
+reliability(cov(BD_ESCALAS))
